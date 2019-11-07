@@ -1,0 +1,6 @@
+# Disable access to all file types except the following
+Order deny,allow
+Deny from all
+<Files ~ ".(php|css|js|jpe?g|png|gif)$">
+Allow from all
+</Files>
