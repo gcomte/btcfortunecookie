@@ -42,12 +42,16 @@ class Invoices {
         update_option(bfcConstants::DB_STORAGE_KEY_INVOICES, serialize($invoices));
     }
 
-    private function getInvoices () {
+    private function getInvoices() {
         if ($this->cachedInvoices == null) {
             $this->cachedInvoices = unserialize(get_option(bfcConstants::DB_STORAGE_KEY_INVOICES));
         }
 
         return $this->cachedInvoices;
+    }
+
+    public function getInvoicesCount() {
+        return count($this->getInvoices());
     }
 
     public function getInvoiceById ($cookieId) {

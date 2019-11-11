@@ -19,4 +19,6 @@ class BfcConstants {
     const SETTINGS_PAGE_BTCPAY_SECTION_TITLE = 'BTCPay Settings';
     const SETTINGS_PAGE_BTCPAY_SECTION_DESCRIPTION = 'Connection to BTCPay Server';
     const SETTINGS_PAGE_BTCPAY_APP_LINK_FIELD_DESCRIPTION = 'BTCPay app URL';
+    const SETTINGS_PAGE_INVOICES_SECTION_TITLE = 'Past Fortune Cookie Requests';
+    const SETTINGS_PAGE_INVOICES_FIELD_DESCRIPTION = 'Count of all paid invoices';
 }

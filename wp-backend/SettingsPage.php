@@ -5,10 +5,12 @@ if (!defined('ABSPATH')) {
 }
 
 require_once(dirname(__FILE__, 2) . '/BfcConstants.php');
+require_once(dirname(__FILE__, 2) . '/model/Invoices.php');
 
 class SettingsPage {
 
     const BTCPAY_SECTION_KEY = 'btcpay_section';
+    const INVOICES_SECTION_KEY = 'invoices_section';
     const BACKEND_CSS_LABEL = 'bitcoin-fortune-cookie-backend';
     const BACKEND_CSS_FILE = 'wp-content/plugins/btcfortunecookie/wp-backend/bitcoin-fortune-cookie-backend.css';
 
@@ -22,8 +24,9 @@ class SettingsPage {
     public function injectPluginSettingsPage() {
         // Hook into the admin menu
         add_action('admin_menu', array($this, 'createPluginSettingsPage'));
-        add_action('admin_init', array( $this, 'setupSections'));
-        add_action('admin_init', array( $this, 'setupFields'));
+        add_action('admin_init', array($this, 'setupSections'));
+        add_action('admin_init', array($this, 'setupBtcPayFields'));
+        add_action('admin_init', array($this, 'setupInvoicesFields'));
     }
 
     public function createPluginSettingsPage() {
@@ -45,6 +48,7 @@ class SettingsPage {
 
     public function setupSections(){
         add_settings_section(self::BTCPAY_SECTION_KEY, BfcConstants::SETTINGS_PAGE_BTCPAY_SECTION_TITLE, array($this, 'btcpaySectionCallback'), BfcConstants::SETTINGS_PAGE_SLUG);
+        add_settings_section(self::INVOICES_SECTION_KEY, BfcConstants::SETTINGS_PAGE_INVOICES_SECTION_TITLE, null, BfcConstants::SETTINGS_PAGE_SLUG);
     }
 
     public function pluginSettingsPageContent() {
@@ -66,12 +70,22 @@ class SettingsPage {
         echo BfcConstants::SETTINGS_PAGE_BTCPAY_SECTION_DESCRIPTION;
     }
 
-    public function setupFields() {
+    public function setupBtcPayFields() {
         add_settings_field(BfcConstants::DB_STORAGE_KEY_BTCPAY_APP_LINK, BfcConstants::SETTINGS_PAGE_BTCPAY_APP_LINK_FIELD_DESCRIPTION, array($this, 'btcpayAppLinkFieldCallback'), BfcConstants::SETTINGS_PAGE_SLUG, self::BTCPAY_SECTION_KEY);
     }
 
     public function btcpayAppLinkFieldCallback($arguments){
         echo '<input name="' . BfcConstants::DB_STORAGE_KEY_BTCPAY_APP_LINK . '" id="' . BfcConstants::DB_STORAGE_KEY_BTCPAY_APP_LINK . '" type="text" value="' . get_option(BfcConstants::DB_STORAGE_KEY_BTCPAY_APP_LINK) . '" />';
+    }
+
+    public function setupInvoicesFields() {
+        add_settings_field(BfcConstants::DB_STORAGE_KEY_BTCPAY_APP_LINK, BfcConstants::SETTINGS_PAGE_INVOICES_FIELD_DESCRIPTION, array($this, 'getInvoicesCount'), BfcConstants::SETTINGS_PAGE_SLUG, self::INVOICES_SECTION_KEY);
+
+    }
+
+    public function getInvoicesCount() {
+        $invoices = Invoices::getInstance();
+        echo $invoices->getInvoicesCount();
     }
 
     public function getBtcPayAppURL() {
