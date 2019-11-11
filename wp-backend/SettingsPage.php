@@ -16,12 +16,7 @@ class SettingsPage {
         // Allow page to call options.php and write settings to options table
         register_setting(BfcConstants::SETTINGS_PAGE_SLUG, BfcConstants::DB_STORAGE_KEY_BTCPAY_APP_LINK);
 
-        add_action('admin_init', array($this, 'callback_for_setting_up_scripts'));
-    }
-
-    public function callback_for_setting_up_scripts() {
-        wp_register_style(self::BACKEND_CSS_LABEL, get_site_url(null, '/' . self::BACKEND_CSS_FILE));
-        wp_enqueue_style(self::BACKEND_CSS_LABEL);
+        add_action('admin_init', array($this, 'addBackendCSS'));
     }
 
     public function injectPluginSettingsPage() {
@@ -81,5 +76,10 @@ class SettingsPage {
 
     public function getBtcPayAppURL() {
         return get_option(BfcConstants::DB_STORAGE_KEY_BTCPAY_APP_LINK);
+    }
+
+    public function addBackendCSS() {
+        wp_register_style(self::BACKEND_CSS_LABEL, get_site_url(null, '/' . self::BACKEND_CSS_FILE));
+        wp_enqueue_style(self::BACKEND_CSS_LABEL);
     }
 }
