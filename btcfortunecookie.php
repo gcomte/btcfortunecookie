@@ -6,7 +6,7 @@
 Plugin Name: Bitcoin Fortune Cookies 
 Plugin URI: http://bitcoinfortunecookie.com
 Description: This plugin displays fortunes coming from within virtual fortune cookies
-Version: 0.0.1
+Version: 0.0.2
 Author: Gabriel Comte
 Author URI: https://gcomte.github.io
 License: MIT
@@ -25,16 +25,47 @@ if(!defined('ABSPATH')) {
 	die;
 }
 
-require_once(dirname(__FILE__) . '/BitcoinFortunes.php');
+require_once(dirname(__FILE__) . '/wp-backend/SettingsPage.php');
+require_once(dirname(__FILE__) . '/btcPayInterface/BTCPayRequest.php');
+require_once(dirname(__FILE__) . '/model/Invoices.php');
+require_once(dirname(__FILE__) . '/BfcConstants.php');
+
 
 class BitcoinFortuneCookie {
-	function displayFortune(){
 
-		$bitcoinFortunes = new BitcoinFortunes();
-		echo '<h1>' . $bitcoinFortunes->getFortune() . '</h1>';
+    private $settingsPage;
+    private $invoices;
+
+    public function __construct() {
+        $this->settingsPage = new SettingsPage();
+        $this->settingsPage->injectPluginSettingsPage();
+        $this->invoices = Invoices::getInstance();
+
+        // Remove all Invoices that are older than 1 year
+        // $invoices->purgeOldInvoices(time() - 60 * 60 * 24 * 365);
+    }
+
+	public function displayFortuneCookiePage(){
+        if(!isset($_GET['cookie'])) {
+            $btcPayRequest = new BTCPayRequest($this->settingsPage->getBTCPayAppURL());
+            echo $btcPayRequest->getDisplayBTCPayButtonHTML();
+            return;
+        } elseif(empty($this->invoices->getInvoiceById($_GET['cookie']))) {
+            echo '<p>' . BfcConstants::INVALID_COOKIE_TEXT . '</p>';
+        } elseif($this->invoices->isInvoiceOlderThan($_GET['cookie'], time() - 60 * 60 * 24 * 30)) {
+            echo '<p>' . BfcConstants::EXPIRED_COOKIE_TEXT . '</p>';
+        } else {
+            $this->displayFortune($_GET['cookie']);
+        }
 	}
+
+    public function displayFortune($cookieId) {
+        $quote = $this->invoices->getQuoteByCookieId($cookieId);
+        echo '<h1>' . $quote . '</h1>';
+    }
 }
+
 
 $bitcoinFortuneCookie = new BitcoinFortuneCookie();
 
-add_action('the_content', array($bitcoinFortuneCookie, 'displayFortune'));
+add_action('the_content', array($bitcoinFortuneCookie, 'displayFortuneCookiePage'));

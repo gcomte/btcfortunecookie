@@ -1,3 +1,5 @@
-#bitcoin-fortune-cookie-btcpay-app-link {
+#bitcoin-fortune-cookie-btcpay-app-url,
+#bitcoin-fortune-cookie-btcpay-invoice-url,
+#bitcoin-fortune-cookie-btcpay-api-key {
     width: 100%;
 }

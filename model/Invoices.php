@@ -54,7 +54,7 @@ class Invoices {
         return count($this->getInvoices());
     }
 
-    public function getInvoiceById ($cookieId) {
+    public function getInvoiceById($cookieId) {
         $invoices = $this->getInvoices();
 
         if (!array_key_exists($cookieId, $invoices)) {
@@ -62,6 +62,16 @@ class Invoices {
         }
 
         return $invoices[$cookieId];
+    }
+
+    public function getQuoteByCookieId($cookieId) {
+        $invoice = $this->getInvoiceById($cookieId);
+        return $invoice[self::INVOICES_ARRAY_KEY_QUOTE];
+    }
+
+    public function isInvoiceOlderThan($cookieId, $unixTimestamp) {
+        $invoice = $this->getInvoiceById($cookieId);
+        return $invoice[self::INVOICES_ARRAY_KEY_DATE] < $unixTimestamp;
     }
 
     /**

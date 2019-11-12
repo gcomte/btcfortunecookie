@@ -20,7 +20,6 @@ class BitcoinFortunes {
 	public function getFortune() {
 		$fortunes = $this->getFortunes();
 		return $fortunes[array_rand($fortunes)];
-      	}
-
+	}
 }
 
