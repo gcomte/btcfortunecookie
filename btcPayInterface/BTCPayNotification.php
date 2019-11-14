@@ -76,8 +76,8 @@ class BTCPayNotification {
 
         $msg = $msgPrefix . 'Cookie Id = ' . var_export($cookieId, true);
         $msg .= $msgPrefix . $btcPayInvoiceId . 'BtcPay Invoice Id = ' . var_export($cookieId, true);
-        $msg .= $msgPrefix . 'Invoce Data -> Status = ' . var_export($btcPayInvoiceData->data->status, true);
-        $msg .= $msgPrefix . 'Invoce Data = ' . var_export($btcPayInvoiceData, true);
+        $msg .= $msgPrefix . 'Invoice Data -> Status = ' . var_export($btcPayInvoiceData->data->status, true);
+        $msg .= $msgPrefix . 'Invoice Data = ' . var_export($btcPayInvoiceData, true);
 
         file_put_contents($logFile, $msg, FILE_APPEND);
 
