@@ -36,8 +36,8 @@ class BitcoinFortuneCookie {
     private $settingsPage;
     private $invoices;
 
-    public function displayCookiePage() {
-        add_action('the_content', array($this, 'displayFortuneCookiePage'));
+    public function overwritePageWithCookiePage() {
+        add_action('the_content', array($this, 'insertCookieToCookiePage'));
     }
 
     public function __construct() {
@@ -49,14 +49,20 @@ class BitcoinFortuneCookie {
         // $invoices->purgeOldInvoices(time() - 60 * 60 * 24 * 365);
     }
 
-	public function displayFortuneCookiePage(){
-        if(!isset($_GET['cookie'])) {
+    public function insertCookieToCookiePage() {
+        if(is_page(17)) {
+            $this->displayFortuneCookiePage();
+        }
+    }
+
+	private function displayFortuneCookiePage(){
+        if (!isset($_GET['cookie'])) {
             $btcPayRequest = new BTCPayRequest($this->settingsPage->getBTCPayAppURL());
             echo $btcPayRequest->getDisplayBTCPayButtonHTML();
             return;
-        } elseif(empty($this->invoices->getInvoiceById($_GET['cookie']))) {
+        } elseif (empty($this->invoices->getInvoiceById($_GET['cookie']))) {
             echo '<p>' . BfcConstants::INVALID_COOKIE_TEXT . '</p>';
-        } elseif($this->invoices->isInvoiceOlderThan($_GET['cookie'], time() - 60 * 60 * 24 * 30)) {
+        } elseif ($this->invoices->isInvoiceOlderThan($_GET['cookie'], time() - 60 * 60 * 24 * 30)) {
             echo '<p>' . BfcConstants::EXPIRED_COOKIE_TEXT . '</p>';
         } else {
             $this->displayFortune($_GET['cookie']);
@@ -70,6 +76,6 @@ class BitcoinFortuneCookie {
 }
 
 $bitcoinFortuneCookie = new BitcoinFortuneCookie();
-$bitcoinFortuneCookie->displayCookiePage();
+$bitcoinFortuneCookie->overwritePageWithCookiePage();
 
 
