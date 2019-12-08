@@ -13,10 +13,11 @@ $btcPayNotification->processNotification();
 
 class BTCPayNotification {
 
+    const BTCPAY_INVOICE_NEW = 'NEW';
     const BTCPAY_INVOICE_CONFIRMED = 'CONFIRMED';
     const BTCPAY_INVOICE_COMPLETE = 'COMPLETE';
     const DB_INVOICE_STATUS_PAID = 'PAID';
-    const ERROR_LOG_FILENAME = 'error.log';
+    const BTCPAY_INTERFACE_FILENAME = 'BTCPayInterface.log';
 
     private $settingsPage;
 
@@ -27,16 +28,22 @@ class BTCPayNotification {
     // After an invoice has been paid, BTCPay sends notification information to this script
     public function processNotification(){
         $notificationData = json_decode(file_get_contents('php://input'));
-        $btcPayInvoiceId = $notificationData->data->id;
+        $btcPayInvoiceId = ($notificationData->data->id ? $notificationData->data->id : $notificationData->id);
 
         // make request to BTCPay to verify the invoice is valid and paid
         $btcPayInvoiceData = $this->requestVerificationData($btcPayInvoiceId);
-        $invoiceIsValid = $this->isInvoiceValid($btcPayInvoiceData, $btcPayInvoiceId, $_GET['cookie']);
 
-        if(!$invoiceIsValid){
+        if($this->isInvoiceNew($btcPayInvoiceData)){
+            // Notification that announces a new but not yet paid invoice, can be ignored.
+            $this->logInfo('A new invoice has been created. Id: ' . $btcPayInvoiceId);
+            return;
+        }
+
+        if(!$this->isInvoiceValid($btcPayInvoiceData, $btcPayInvoiceId, $_GET['cookie'])){
             $this->writeErrorLogAndDie($btcPayInvoiceData, $btcPayInvoiceId, $_GET['cookie']);
         }
 
+        $this->logInfo('Invoice paid! Id: ' . $btcPayInvoiceId . ', Status: ' . $btcPayInvoiceData->data->status);
         $this->storePaidInvoice($btcPayInvoiceData);
     }
 
@@ -51,6 +58,10 @@ class BTCPayNotification {
 
         $context = stream_context_create($options);
         return json_decode(file_get_contents($this->settingsPage->getBTCPayInvoiceURL() . '/' . $btcPayInvoiceId, false, $context));
+    }
+
+    private function isInvoiceNew($btcPayInvoiceData){
+        return strtoupper($btcPayInvoiceData->data->status) == self::BTCPAY_INVOICE_NEW;
     }
 
     private function isInvoiceValid($btcPayInvoiceData, $btcPayInvoiceId, $cookieId){
@@ -69,18 +80,32 @@ class BTCPayNotification {
     }
 
     private function writeErrorLogAndDie($btcPayInvoiceData, $btcPayInvoiceId, $cookieId){
-        $logFile = dirname(__FILE__, 2) . '/' . self::ERROR_LOG_FILENAME;
+        $prefix2 = '[Invalid Invoice] ';
 
-        $now = date('d.m.Y H:i:s', time());
-        $msgPrefix = "\n[Invalid Invoice - $now] ";
-
-        $msg = $msgPrefix . 'Cookie Id = ' . var_export($cookieId, true);
-        $msg .= $msgPrefix . $btcPayInvoiceId . 'BtcPay Invoice Id = ' . var_export($cookieId, true);
-        $msg .= $msgPrefix . 'Invoice Data -> Status = ' . var_export($btcPayInvoiceData->data->status, true);
-        $msg .= $msgPrefix . 'Invoice Data = ' . var_export($btcPayInvoiceData, true);
-
-        file_put_contents($logFile, $msg, FILE_APPEND);
+        $this->logError($prefix2 . 'BtcPay Invoice Id = ' . var_export($btcPayInvoiceId, true));
+        $this->logError($prefix2 . 'Cookie Id = ' . var_export($cookieId, true));
+        $this->logError($prefix2 . 'Invoice Data -> Status = ' . var_export($btcPayInvoiceData->data->status, true));
+        $this->logError($prefix2 . 'Invoice Data = ' . var_export($btcPayInvoiceData, true));
 
         die();
+    }
+
+    private function logEvent($message, $prefix) {
+        $logFile = dirname(__FILE__, 2) . '/' . self::BTCPAY_INTERFACE_FILENAME;
+        $now = date('d.m.Y H:i:s', time());
+
+        if($prefix){
+            $prefix = "$now [$prefix] ";
+        }
+
+        file_put_contents($logFile, "\n" . $prefix . $message, FILE_APPEND);
+    }
+
+    private function logError($message) {
+        $this->logEvent($message, 'ERROR');
+    }
+
+    private function logInfo($message) {
+        $this->logEvent($message, 'INFO');
     }
 }
