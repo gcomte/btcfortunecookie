@@ -36,6 +36,10 @@ class BitcoinFortuneCookie {
     private $settingsPage;
     private $invoices;
 
+    public function displayCookiePage() {
+        add_action('the_content', array($this, 'displayFortuneCookiePage'));
+    }
+
     public function __construct() {
         $this->settingsPage = new SettingsPage();
         $this->settingsPage->injectPluginSettingsPage();
@@ -65,7 +69,7 @@ class BitcoinFortuneCookie {
     }
 }
 
-
 $bitcoinFortuneCookie = new BitcoinFortuneCookie();
+$bitcoinFortuneCookie->displayCookiePage();
 
-add_action('the_content', array($bitcoinFortuneCookie, 'displayFortuneCookiePage'));
+
