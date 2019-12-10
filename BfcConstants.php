@@ -5,6 +5,7 @@ class BfcConstants {
     // All data is being serialized and stored in the table 'wp_options'.
     // These constants store the tags that are being used in the field wp_options.option_name .
     const DB_STORAGE_KEY_INVOICES = 'bitcoin-fortune-cookie-invoices';
+    const DB_STORAGE_KEY_WP_PAGE_COOKIE = 'bitcoin-fortune-cookie-wp-page-for-cookie';
     const DB_STORAGE_KEY_BTCPAY_APP_URL = 'bitcoin-fortune-cookie-btcpay-app-url';
     const DB_STORAGE_KEY_BTCPAY_INVOICE_URL = 'bitcoin-fortune-cookie-btcpay-invoice-url';
     const DB_STORAGE_KEY_BTCPAY_API_KEY = 'bitcoin-fortune-cookie-btcpay-api-key';
@@ -23,6 +24,8 @@ class BfcConstants {
     const SETTINGS_PAGE_DASHICON_SYMBOL = 'dashicons-star-half';
     const SETTINGS_PAGE_MENU_TITLE = 'Fortune Cookie';
     const SETTINGS_PAGE_POSITION = 66; // Just below the "Plugins" menu entry
+    const SETTINGS_PAGE_WP_SECTION_TITLE = 'WordPress Settings';
+    const SETTINGS_PAGE_WP_PAGE_FOR_COOKIE_DESCRIPTION = 'Container-page for the cookie';
     const SETTINGS_PAGE_BTCPAY_SECTION_TITLE = 'BTCPay Settings';
     const SETTINGS_PAGE_BTCPAY_SECTION_DESCRIPTION = 'Connection to BTCPay Server';
     const SETTINGS_PAGE_BTCPAY_APP_URL_FIELD_DESCRIPTION = 'BTCPay app URL';

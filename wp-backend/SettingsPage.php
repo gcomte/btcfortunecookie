@@ -9,6 +9,7 @@ require_once(dirname(__FILE__, 2) . '/model/Invoices.php');
 
 class SettingsPage {
 
+    const WP_SECTION_KEY = 'wp_section';
     const BTCPAY_SECTION_KEY = 'btcpay_section';
     const INVOICES_SECTION_KEY = 'invoices_section';
     const BACKEND_CSS_LABEL = 'bitcoin-fortune-cookie-backend';
@@ -16,6 +17,7 @@ class SettingsPage {
 
     public function __construct(){
         // Allow page to call options.php and write settings to options table
+        register_setting(BfcConstants::SETTINGS_PAGE_SLUG, BfcConstants::DB_STORAGE_KEY_WP_PAGE_COOKIE);
         register_setting(BfcConstants::SETTINGS_PAGE_SLUG, BfcConstants::DB_STORAGE_KEY_BTCPAY_APP_URL);
         register_setting(BfcConstants::SETTINGS_PAGE_SLUG, BfcConstants::DB_STORAGE_KEY_BTCPAY_INVOICE_URL);
         register_setting(BfcConstants::SETTINGS_PAGE_SLUG, BfcConstants::DB_STORAGE_KEY_BTCPAY_API_KEY);
@@ -27,6 +29,7 @@ class SettingsPage {
         // Hook into the admin menu
         add_action('admin_menu', array($this, 'createPluginSettingsPage'));
         add_action('admin_init', array($this, 'setupSections'));
+        add_action('admin_init', array($this, 'setupWPsettingsFields'));
         add_action('admin_init', array($this, 'setupBTCPayFields'));
         add_action('admin_init', array($this, 'setupInvoicesFields'));
     }
@@ -49,6 +52,7 @@ class SettingsPage {
     }
 
     public function setupSections(){
+        add_settings_section(self::WP_SECTION_KEY, BfcConstants::SETTINGS_PAGE_WP_SECTION_TITLE, null, BfcConstants::SETTINGS_PAGE_SLUG);
         add_settings_section(self::BTCPAY_SECTION_KEY, BfcConstants::SETTINGS_PAGE_BTCPAY_SECTION_TITLE, array($this, 'btcpaySectionCallback'), BfcConstants::SETTINGS_PAGE_SLUG);
         add_settings_section(self::INVOICES_SECTION_KEY, BfcConstants::SETTINGS_PAGE_INVOICES_SECTION_TITLE, null, BfcConstants::SETTINGS_PAGE_SLUG);
     }
@@ -68,6 +72,10 @@ class SettingsPage {
         <?php
     }
 
+    public function setupWPsettingsFields(){
+        add_settings_field(BfcConstants::DB_STORAGE_KEY_WP_PAGE_COOKIE, BfcConstants::SETTINGS_PAGE_WP_PAGE_FOR_COOKIE_DESCRIPTION, array($this, 'wpPageCookieDropdownCallback'), BfcConstants::SETTINGS_PAGE_SLUG, self::WP_SECTION_KEY);
+    }
+
     public function btcpaySectionCallback(){
         echo BfcConstants::SETTINGS_PAGE_BTCPAY_SECTION_DESCRIPTION;
     }
@@ -76,6 +84,17 @@ class SettingsPage {
         add_settings_field(BfcConstants::DB_STORAGE_KEY_BTCPAY_APP_URL, BfcConstants::SETTINGS_PAGE_BTCPAY_APP_URL_FIELD_DESCRIPTION, array($this, 'btcpayAppUrlFieldCallback'), BfcConstants::SETTINGS_PAGE_SLUG, self::BTCPAY_SECTION_KEY);
         add_settings_field(BfcConstants::DB_STORAGE_KEY_BTCPAY_INVOICE_URL, BfcConstants::SETTINGS_PAGE_BTCPAY_INVOICES_URL_FIELD_DESCRIPTION, array($this, 'btcpayInvoiceUrlFieldCallback'), BfcConstants::SETTINGS_PAGE_SLUG, self::BTCPAY_SECTION_KEY);
         add_settings_field(BfcConstants::DB_STORAGE_KEY_BTCPAY_API_KEY, BfcConstants::SETTINGS_PAGE_BTCPAY_API_KEY_FIELD_DESCRIPTION, array($this, 'btcpayApiKeyFieldCallback'), BfcConstants::SETTINGS_PAGE_SLUG, self::BTCPAY_SECTION_KEY);
+    }
+
+    public function wpPageCookieDropdownCallback($arguments){
+        $currentSelection = get_option(BfcConstants::DB_STORAGE_KEY_WP_PAGE_COOKIE);
+
+        echo '<select name="' . BfcConstants::DB_STORAGE_KEY_WP_PAGE_COOKIE . '" id="' . BfcConstants::DB_STORAGE_KEY_WP_PAGE_COOKIE . '">';
+        foreach (get_pages() as $page) {
+            $selected = ($currentSelection == $page->ID ? ' selected' : '');
+            echo '<option value="' . $page->ID . '"' . $selected . '> ' . $page->post_title . '</option>';
+        }
+        echo '</select>';
     }
 
     public function btcpayAppUrlFieldCallback($arguments){

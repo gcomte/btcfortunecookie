@@ -50,7 +50,8 @@ class BitcoinFortuneCookie {
     }
 
     public function insertCookieToCookiePage() {
-        if(is_page(17)) {
+        $pageWhereCookieShouldBeDisplayed = get_option(BfcConstants::DB_STORAGE_KEY_WP_PAGE_COOKIE);
+        if(is_page($pageWhereCookieShouldBeDisplayed)) {
             $this->displayFortuneCookiePage();
         }
     }
