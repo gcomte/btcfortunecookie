@@ -6,7 +6,7 @@
 Plugin Name: Bitcoin Fortune Cookies 
 Plugin URI: http://bitcoinfortunecookie.com
 Description: This plugin displays fortunes coming from within virtual fortune cookies
-Version: 0.0.2
+Version: 0.0.3
 Author: Gabriel Comte
 Author URI: https://gcomte.github.io
 License: MIT
