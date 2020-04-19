@@ -41,6 +41,15 @@ class BitcoinFortuneCookie {
     }
 
     public function __construct() {
+        define('CSS_FILE_PATH', get_site_url() . '/' . BfcConstants::FRONTEND_CSS_URL_PATH);
+
+        define('PLUGIN_BASE_DIR', dirname(__FILE__));
+        define('CREATE_COOKIE_PAGE_ABSOLUTE_PATH', PLUGIN_BASE_DIR . '/' . BfcConstants::CREATE_COOKIE_PAGE_RELATIVE_PATH);
+        define('OPEN_COOKIE_PAGE_ABSOLUTE_PATH', PLUGIN_BASE_DIR . '/' . BfcConstants::OPEN_COOKIE_PAGE_RELATIVE_PATH);
+        define('INVALID_COOKIE_PAGE_ABSOLUTE_PATH', PLUGIN_BASE_DIR . '/' . BfcConstants::INVALID_COOKIE_PAGE_RELATIVE_PATH);
+
+        define('INVALID_COOKIE_IMAGE_URL', get_site_url() . '/' . BfcConstants::IMAGES_DIRECTORY_URL . '/' . BfcConstants::INVALID_COOKIE_IMAGE_FILENAME);
+
         $this->settingsPage = new SettingsPage();
         $this->settingsPage->injectPluginSettingsPage();
         $this->invoices = Invoices::getInstance();
@@ -52,23 +61,31 @@ class BitcoinFortuneCookie {
     public function insertCookieToCookiePage() {
         $pageWhereCookieShouldBeDisplayed = get_option(BfcConstants::DB_STORAGE_KEY_WP_PAGE_COOKIE);
         if(is_page($pageWhereCookieShouldBeDisplayed)) {
-            $this->displayFortuneCookiePage();
+            $this->displayOpenFortuneCookiePage();
         }
     }
 
-	private function displayFortuneCookiePage(){
+	private function displayOpenFortuneCookiePage(){
+
+        wp_enqueue_style(BfcConstants::FRONTEND_CSS_HANDLE, CSS_FILE_PATH);
+
         if (!isset($_GET['cookie'])) {
             $btcPayRequest = new BTCPayRequest($this->settingsPage->getBTCPayAppURL());
             echo $btcPayRequest->getDisplayBTCPayButtonHTML();
-            return;
         } elseif (empty($this->invoices->getInvoiceById($_GET['cookie']))) {
-            echo '<p>' . BfcConstants::INVALID_COOKIE_TEXT . '</p>';
+            echo $this->constructInvalidFortuneCookiePage(BfcConstants::INVALID_COOKIE_TEXT);
         } elseif ($this->invoices->isInvoiceOlderThan($_GET['cookie'], time() - 60 * 60 * 24 * 30)) {
-            echo '<p>' . BfcConstants::EXPIRED_COOKIE_TEXT . '</p>';
+            echo $this->constructInvalidFortuneCookiePage(BfcConstants::EXPIRED_COOKIE_TEXT);
         } else {
             $this->displayFortune($_GET['cookie']);
         }
 	}
+
+    private function constructInvalidFortuneCookiePage($message){
+        $htmlSkeleton = file_get_contents(INVALID_COOKIE_PAGE_ABSOLUTE_PATH);
+        $htmlWithImage = str_replace(BfcConstants::INVALID_COOKIE_IMAGE_PLACEHOLDER, INVALID_COOKIE_IMAGE_URL, $htmlSkeleton);
+        return str_replace(BfcConstants::INVALID_COOKIE_MESSAGE_PLACEHOLDER, $message, $htmlWithImage);
+    }
 
     public function displayFortune($cookieId) {
         $quote = $this->invoices->getQuoteByCookieId($cookieId);

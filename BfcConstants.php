@@ -12,6 +12,20 @@ class BfcConstants {
 
     const FORTUNES_FILE_NAME = 'fortunes.txt';
 
+    // HTML PAGES
+    const CREATE_COOKIE_PAGE_RELATIVE_PATH = 'src/html/createCookie.html';
+    const OPEN_COOKIE_PAGE_RELATIVE_PATH = 'src/html/openCookie.html';
+    const INVALID_COOKIE_PAGE_RELATIVE_PATH = 'src/html/invalidCookie.html';
+
+    const FRONTEND_CSS_HANDLE = 'fortuneCookieFrontendCSS';
+    const FRONTEND_CSS_URL_PATH = 'wp-content/plugins/btcfortunecookie/src/css/fortuneCookie.css';
+
+    const IMAGES_DIRECTORY_URL = 'wp-content/plugins/btcfortunecookie/src/images';
+    const INVALID_COOKIE_IMAGE_FILENAME = '20200419-Cookie-404_Fortune_Not_Found.png';
+
+    const INVALID_COOKIE_MESSAGE_PLACEHOLDER = '<invalid-cookie-message-placeholder />';
+    const INVALID_COOKIE_IMAGE_PLACEHOLDER = 'INVALID_COOKIE_IMAGE_SOURCE_PLACEHOLDER';
+
     // GUI
     const BTCPAY_BUTTON_TEXT = 'Crack that Cookie Open ⚡';
     const INVALID_COOKIE_TEXT = 'This cookie is invalid.';
