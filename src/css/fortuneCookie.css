@@ -1,0 +1,15 @@
+/* Import web fonts Titillium Web and Karma */
+@import url('https://fonts.googleapis.com/css2?family=Titillium+Web:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Karma:wght@700&display=swap');
+
+img {
+    display: block;
+    margin-top:auto;
+    margin-left: auto;
+    margin-right: auto;
+    width: 40%;
+}
+
+.cookieContainer{
+    text-align: center;
+}
